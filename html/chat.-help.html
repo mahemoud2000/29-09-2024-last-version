@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صفحة المستخدم</title>
+    <!-- روابط مكتبات Firebase الصحيحة -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="../js/chat-help.js"></script>
+</head>
+<body>
+    <h1>صفحة المستخدم</h1>
+    <div id="messagesContainer" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;"></div>
+    <input type="text" id="messageInput" placeholder="اكتب رسالتك هنا...">
+    <button onclick="sendMessage()">إرسال</button>
+    <input type="file" id="fileInput">
+    <button onclick="sendImage()">إرسال صورة</button>
+    <button onclick="startNewConversation()">بدء محادثة جديدة</button> <!-- زر بدء محادثة جديدة -->
+    <div id="confirmationMessage" style="margin-top: 20px; color: red;"></div> <!-- عنصر رسالة التأكيد -->
+</body>
+</html>
