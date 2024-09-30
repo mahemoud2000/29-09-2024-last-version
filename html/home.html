@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title> الصفحه الرئيسيه</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- تحميل Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode/dist/JsBarcode.all.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Changa:wght@200..800&family=Harmattan:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- تضمين مكتبة html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!--  مكتبه جافا سكريبت بي دي اف  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script type="module" src="../js/sales.js"></script>
+    <script type="module" src="../js/barcode.js"></script>
+    <script type="module" src="../js/storage.js"></script>
+    <script type="module" src="../js/time-reports.js"></script>
+    <script type="module" src="../js/db.js"></script>
+    <script type="module" src="../js/reports-js.js"></script>
+    <script type="module" src="../js/canvas.-3d.js"></script>
+    <!-- <script type="module" src="../js/chat-help.js"></script> -->
+</head>
+
+<body>
+    <div class="main-page">
+        <header>
+            <ul>
+                <li id="btnSupport">
+                    <a href="chat.-help.html" target="_blank"><img src="../images/help.png" width="50px" alt=""> الدعم الخاص</a>
+                    
+                </li>
+                <li onclick="changePassName()" id="btnChangePassName">
+                    <a href="#">تغيير كلمه السر/الاسم</a>
+
+                </li>
+                <li onclick="barCode()" id="btnBarcode">
+                    <a href="#">انشاء بار كود</a>
+
+                </li>
+                <li>
+                    <a href="../index.html">تسجيل خروج </a>
+
+                </li>
+            </ul>
+            <h1 title="يوحي بالبساطه والاناقه في البرمجه" class="logo">ZenCode </h1>
+        </header>
+        <div class="section-side-bar">
+            <aside>
+                <div class="side-bar">
+                    <ul>
+                        <li onclick="sales()" id="btnSales">
+                            <a href="#">بيع منتجات</a>
+                        </li>
+                        <li onclick="timeReport()" id="btnReportTime">
+                            <a href="#"> تقرير محدد</a>
+                        </li>
+                        <li onclick="storage()" id="btnStorage">
+                            <a href="#">المخزن</a>
+                        </li>
+                        <li onclick="showDashBoard()" id="btnDashboard">
+                            <a href="#">لوحة التحكم </a>
+                        </li>
+                        <li onclick="fullReport()" id="btnFullReport">
+                            <a href="#">تقرير كامل</a>
+                        </li>
+                        <li onclick="addAdmin()" id="btnAddAdmin">
+                            <a href="#">اضافه مسؤل</a>
+                        </li>
+                    </ul>
+                </div>
+            </aside>
+            <section>
+                <form id="changePasswordForm">
+                    <h2>تغيير الاسم</h2>
+
+                    <div class="change-name">
+                        <label for="newName">اسم جديد:</label>
+                        <br>
+                        <input type="text" id="newName" value="owner">
+                    </div>
+                    <h2>تغيير كلمه السر</h2>
+                    <div class="change-pass">
+                        <label for="oldPassword">كلمة السر القديمة:</label>
+                        <input type="password" id="oldPassword" required>
+                        <br>
+                        <label for="newPassword">كلمة السر الجديدة:</label>
+                        <input type="password" id="newPassword" required>
+                    </div>
+                    <br>
+                    <button type="submit">تغيير الاسم وكلمة السر</button>
+                </form>
+                <br>
+                <form id="ownerForm" class="form">
+                    <h2>تواصل مع الدعم الخاص بنظامك</h2>
+                </form>
+
+                <div class="bar-code" id="barCode">
+                    <h1>إنشاء باركود</h1>
+                    <div class="creat-bar-code">
+                        <label for="startId">ID البداية:</label>
+                        <input type="number" id="startId" value="1" min="1"><br>
+                        <label for="endId">ID النهاية:</label>
+                        <input type="number" id="endId" value="10" min="1"><br>
+                        <button onclick="generateBarcodes()">إنشاء باركود</button>
+                    </div>
+                    <div id="barcodesContainer"></div>
+                    <button onclick="downloadAsImage()">تحميل كصورة</button>
+                    <button onclick="downloadAsPDF()">تحميل كملف PDF</button>
+                    <button onclick="printBarcodes()">طباعة باركود</button>
+                </div>
+                <div class="sales" id="sales">
+                    <h1> بيع المنتجات</h1>
+                    <label>البحث عن المنتج بالـ ID:</label>
+                    <input type="text" id="searchId" oninput="searchProductById()" autofocus><br><br>
+                    <div id="searchResults"></div>
+                    <h2>فاتورة البيع</h2>
+                    <div id="invoice"></div>
+                    <p id="totalCount">إجمالي عدد الأصناف: 0</p>
+                    <p id="totalPrice">إجمالي السعر: 0</p>
+                    <button onclick="completeSale()">إتمام عملية البيع</button>
+                    <button onclick="printInvoice()" id="printBill">طباعة الفاتوره</button>
+                    <input type="text" id="searchSaleId" placeholder="البحث عن العملية برقم العملية"
+                        oninput="searchSaleById()">
+                    <div id="salesList"></div>
+                    <!-- لودر التحميل -->
+                    <div id="loader">جاري تحميل البيانات...</div>
+                </div>
+                <div class="storage" id="storage">
+                    <h1>إضافة منتج جديد إلى المخزن</h1>
+                    <!-- الحقول المطلوبة -->
+                    <div class="inputs-storage">
+                        <label>اسم المنتج:</label>
+                        <input type="text" id="productName"><br><br>
+                        <label>سعر المنتج:</label>
+                        <input type="number" id="productPrice"><br><br>
+                        <label>كمية المنتج:</label>
+                        <input type="number" id="productQuantity"><br><br>
+                    </div>
+                    <!-- زر الإضافة -->
+                    <div class="btn-add-hidden">
+                        <button onclick="addProduct()">إضافة المنتج</button>
+                        <button id="toggleButton" onclick="toggleProducts()">عرض جميع المنتجات</button>
+                    </div>
+                    <!-- خانة البحث -->
+                    <input type="text" id="searchInput" placeholder="ابحث عن المنتج بالاسم أو ID"
+                        oninput="filterProducts()" style="display:none;">
+
+                    <!-- لودر التحميل -->
+                    <p id="loader" style="display:none;">تحميل...</p>
+
+                    <!-- رسالة النجاح -->
+                    <p id="successMessage" style="display:none;">تم إضافة المنتج إلى المخزن بنجاح</p>
+
+                    <!-- عرض جميع المنتجات -->
+                    <div id="productsList" style="display:none;"></div>
+                </div>
+                <div class="time-report" id="timeReport">
+                    <h1>إنشاء تقارير مفصلة</h1>
+                    <!-- حقل إدخال لتاريخ البداية والنهاية -->
+                    <div class="inputs-labels-time-report">
+                        <label for="startDate">تاريخ البداية:</label>
+                        <input type="datetime-local" id="startDate">
+                        <label for="endDate">تاريخ النهاية:</label>
+                        <input type="datetime-local" id="endDate">
+                    </div>
+                    <br><br>
+                    <button onclick="generateReport()" id="create-report">إنشاء تقرير</button>
+                    <!-- لودر التحميل -->
+                    <p id="loader">تحميل...</p>
+                    <!-- عرض التقرير في جدول -->
+                    <table id="reportTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>رقم العملية</th>
+                                <th>اسم المنتج</th>
+                                <th>السعر</th>
+                                <th>الكمية</th>
+                                <th>التاريخ والوقت</th>
+                                <th>إجمالي المبلغ</th>
+                                <th>العمليات</th> <!-- عمود للعمليات -->
+                            </tr>
+                        </thead>
+                        <tbody id="reportBody"></tbody>
+                    </table>
+                    <!-- أزرار الطباعة -->
+                    <button onclick="printFullReport()" style="display:none;" id="printReportButton">طباعة التقرير
+                        الكامل</button>
+                    <button onclick="printSingleSale(saleId)" style="display:none;" id="printSaleButton">طباعة هذه
+                        العملية</button>
+                </div>
+                <div class="dashboard" id="dashboard">
+                    <h1>لوحة التحكم</h1>
+                    <div class="content-dashboard">
+                        <div class="btns">
+                            <button onclick="showProducts()">عرض المنتجات</button>
+                            <button onclick="showSales()">عرض المبيعات</button>
+                            <!-- <button onclick="showReports()">عرض التقارير</button> -->
+                            <button onclick="deleteAllData()">مسح كل البيانات</button>
+                        </div>
+                        <input type="text" id="searchInput2" placeholder="ابحث عن منتج...">
+                        <div id="loader">جارٍ التحميل...</div>
+                        <div id="dataDisplay"></div>
+                    </div>
+                </div>
+                <div class="full-report" id="fullReport">
+                    <h1>تقارير المنتجات والمبيعات</h1>
+                    <h2>تقرير المنتجات</h2>
+                    <button onclick="generateProductReport()">إنشاء تقرير المنتجات</button>
+                    <h2>تقرير المبيعات</h2>
+                    <button onclick="generateSalesReport()">إنشاء تقرير المبيعات</button>
+                    <div id="reportContainer">
+                        <h2>التقرير</h2>
+                        <div id="reportContent"></div>
+                        <button onclick="downloadPDF()">تحميل PDF</button>
+                        <button onclick="printReport()">طباعة التقرير</button>
+                    </div>
+                </div>
+                <canvas id="networkCanvas"></canvas>
+             </div>
+        </section>
+    </div>
+    <footer>
+        <p>
+            Made By Mahmoud Hamed &copy; 2024
+            <br>
+            Phone: 01144897324
+        </p>
+    </footer>
+    </div>
+    <script>
+        // function chatHelp() {
+        //     document.getElementById('chatHelp').style.display = 'block';
+        //     document.getElementById('sales').style.display = 'none';
+        //     document.getElementById('barCode').style.display = 'none';
+        //     document.getElementById('changePasswordForm').style.display = 'none';
+        //     document.getElementById('ownerForm').style.display = 'none';
+        //     document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+        // }
+
+        function fullReport() {
+            document.getElementById('fullReport').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('btnFullReport').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnSales').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+
+        }
+        function showDashBoard() {
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('btnDashboard').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnSales').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+
+        }
+        function timeReport() {
+            document.getElementById('timeReport').style.display = 'block';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('btnReportTime').style.background = 'var(--btnColor)';
+
+
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            // document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnSales').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+        }
+
+        function storage() {
+            document.getElementById('storage').style.display = 'block';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('btnStorage').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnSales').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+
+        }
+        function sales() {
+            document.getElementById('sales').style.display = 'block';
+            document.getElementById('searchId').focus(); // تعيين التركيز على حقل الإدخال
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('btnSales').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+        }
+        function barCode() {
+            document.getElementById('barCode').style.display = 'block';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            // document.getElementById('chatHelp').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('btnBarcode').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+        }
+
+        function addAdmin() {
+            document.getElementById('ownerForm').style.display = 'block';
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('btnAddAdmin').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+            document.getElementById('btnChangePassName').style.background = 'var(--subColor)';
+
+
+        }
+        function changePassName() {
+            document.getElementById('changePasswordForm').style.display = 'block';
+            document.getElementById('ownerForm').style.display = 'none';
+            document.getElementById('barCode').style.display = 'none';
+            document.getElementById('sales').style.display = 'none';
+            document.getElementById('storage').style.display = 'none';
+            document.getElementById('timeReport').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('fullReport').style.display = 'none';
+            document.getElementById('btnChangePassName').style.background = 'var(--btnColor)';
+
+            document.getElementById('btnAddAdmin').style.background = 'var(--subColor)';
+            document.getElementById('btnBarcode').style.background = 'var(--subColor)';
+            document.getElementById('btnReportTime').style.background = 'var(--subColor)';
+            document.getElementById('btnDashboard').style.background = 'var(--subColor)';
+            document.getElementById('btnFullReport').style.background = 'var(--subColor)';
+            document.getElementById('btnStorage').style.background = 'var(--subColor)';
+
+        }
+        // إعداد Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCPpTAJDRfFuDkq2TGCVIU_LnmYRBXTnSc",
+            authDomain: "new-protfolio.firebaseapp.com",
+            databaseURL: "https://new-protfolio-default-rtdb.firebaseio.com",
+            projectId: "new-protfolio",
+            storageBucket: "new-protfolio.appspot.com",
+            messagingSenderId: "90141039664",
+            appId: "1:90141039664:web:44d13d2f3b943f510aa1f5"
+        };
+
+        // تهيئة Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // // نموذج إضافة مالك
+        // document.getElementById('ownerForm').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+        //     database.ref('owners').once('value').then(snapshot => {
+        //         if (snapshot.exists()) {
+        //             alert('تم إضافة مالك واحد فقط بالفعل.');
+        //         } else {
+        //             const name = document.getElementById('name').value;
+        //             const password = document.getElementById('password').value;
+
+        //             database.ref('owners').push({
+        //                 name: name,
+        //                 password: password
+        //             }).then(() => {
+        //                 alert('تم إضافة المالك بنجاح!');
+        //                 document.getElementById('ownerForm').reset();
+        //             }).catch((error) => {
+        //                 console.error('حدث خطأ: ', error);
+        //             });
+        //         }
+        //     });
+        // });
+
+        // // نموذج تغيير الاسم وكلمة السر
+        // document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+        //     event.preventDefault();
+        //     const oldPassword = document.getElementById('oldPassword').value;
+        //     const newName = document.getElementById('newName').value;
+        //     const newPassword = document.getElementById('newPassword').value;
+
+        //     // البحث عن المالك وتحديث الاسم وكلمة السر
+        //     database.ref('owners').once('value').then(snapshot => {
+        //         let found = false;
+        //         snapshot.forEach(childSnapshot => {
+        //             const owner = childSnapshot.val();
+        //             if (owner.password === oldPassword) {
+        //                 found = true;
+        //                 childSnapshot.ref.update({
+        //                     name: newName,
+        //                     password: newPassword
+        //                 });
+        //             }
+        //         });
+        //         if (found) {
+        //             alert('تم تغيير الاسم وكلمة السر بنجاح!');
+        //             document.getElementById('changePasswordForm').reset();
+        //         } else {
+        //             alert('كلمة السر القديمة غير صحيحة.');
+        //         }
+        //     });
+        // });
+        // نموذج تغيير الاسم وكلمة السر
+        document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newName = document.getElementById('newName').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            // البحث عن المالك وتحديث الاسم وكلمة السر
+            database.ref('owners').once('value').then(snapshot => {
+                let found = false;
+                snapshot.forEach(childSnapshot => {
+                    const owner = childSnapshot.val();
+                    if (owner.pass === oldPassword) { // استخدم `pass` بدلاً من `password`
+                        found = true;
+                        childSnapshot.ref.update({
+                            name: newName,
+                            pass: newPassword // استخدم `pass` بدلاً من `password`
+                        });
+                    }
+                });
+                if (found) {
+                    alert('تم تغيير الاسم وكلمة السر بنجاح!');
+                    document.getElementById('changePasswordForm').reset();
+                } else {
+                    alert('كلمة السر القديمة غير صحيحة.');
+                }
+            }).catch(error => {
+                console.error('حدث خطأ أثناء تحديث البيانات: ', error);
+            });
+        });
+
+    </script>
+
+</body>
+
+</html>

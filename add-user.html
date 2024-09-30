@@ -2,14 +2,14 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <title>تسجيل الدخول</title>
+    <title>ضيف مستخدم</title>
     <!-- تحميل Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
     <form id="loginForm">
-        <h2>تسجيل الدخول</h2>
+        <h2>ضيف مستخدم</h2>
         <label for="loginName">اسم:</label>
         <input type="text" id="loginName" required>
         <br>
@@ -22,8 +22,6 @@
     <p id="supportMessage" style="display:none;">
         كلمة السر خاطئة. إذا فقدت كلمة السر يمكنك إرسال رسالة الدعم من أسفل الشاشة على مدار 24 ساعة، لا تقلق.
     </p>
-
-    <div id="loginMessage" style="color: red; display: none;"></div>
 
     <script>
         // إعداد Firebase
@@ -47,31 +45,19 @@
             const loginName = document.getElementById('loginName').value;
             const loginPassword = document.getElementById('loginPassword').value;
 
-            // البحث عن بيانات المستخدم في قاعدة البيانات
-            database.ref('owners/').orderByChild('name').equalTo(loginName).once('value')
-                .then(snapshot => {
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        const userKey = Object.keys(userData)[0]; // الحصول على مفتاح المستخدم
-                        const user = userData[userKey];
+            // إنشاء معرف فريد للمستخدم الجديد
+            const newUserRef = database.ref('owners/').push(); // هذا ينشئ معرفًا فريدًا تحت "owners"
 
-                        // التحقق من كلمة السر
-                        if (user.pass === loginPassword) {
-                            alert('تم تسجيل الدخول بنجاح!');
-                            // يمكنك إضافة تحويل المستخدم إلى الصفحة الرئيسية هنا
-                            window.location.href = 'html/home.html';
-                        } else {
-                            document.getElementById('loginMessage').innerText = 'كلمة السر خاطئة.';
-                            document.getElementById('loginMessage').style.display = 'block';
-                        }
-                    } else {
-                        document.getElementById('loginMessage').innerText = 'المستخدم غير موجود.';
-                        document.getElementById('loginMessage').style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('حدث خطأ أثناء البحث: ', error);
-                });
+            // تخزين البيانات تحت owners/معرف المستخدم الجديد
+            newUserRef.set({
+                name: loginName,
+                pass: loginPassword
+            }).then(() => {
+                alert('تم تخزين البيانات بنجاح!');
+                // يمكنك إضافة تحويل المستخدم إلى الصفحة الرئيسية هنا
+            }).catch(error => {
+                console.error('حدث خطأ أثناء التخزين: ', error);
+            });
         });
     </script>
 </body>
